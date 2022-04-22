@@ -15,6 +15,7 @@ class Writer:
         self.writer.writeheader()
 
     def enregistre_nouvelle_page(self, donnees):
+        print(donnees)
         self.writer.writerow(donnees)
 
     def close(self):

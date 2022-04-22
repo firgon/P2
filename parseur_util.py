@@ -44,7 +44,7 @@ def scraper_une_page(base_url, titre, category):
     soustitre = soup.find('div', id="product_description")
     description = soustitre.findNextSibling().string
     # on supprime ...More en fin de description
-    resultat['product_description'] = description.removesuffix("...more")
+    resultat['product_description'] = str(description.removesuffix("...more"))
 
     # on récupère toutes les infos du tableau et on les utilise en fonction de la valeur d'entête
     tableau = soup.findAll('tr')
@@ -88,12 +88,15 @@ def scraper_une_category(base_url, category_url):
     for x in range(1, 100):
         # charge la page (avec le suffixe index.html ou pageX.html suivant le cas)
         if x == 1:
-            page = requests.get(base_url + category_url + "/index.html")
+            page = requests.get(base_url + category_url)
+            # une fois la page 1 passée, il faut supprimer /index.html à la fin
+            # pour préparer les pages suivantes
+            category_url = category_url.removesuffix("/index.html")
         else:
             page = requests.get(base_url + category_url + '/page-' + str(x) + '.html')
 
         # si le chargement a échoué, on renvoie les résultats déjà obtenus
-        if page.status_code != 200:
+        if not page.ok:
             return resultat
         # sinon on parse la page
         else:
@@ -102,13 +105,14 @@ def scraper_une_category(base_url, category_url):
             # les url des livres sont dans des <a> dans de tous les <h3> de la page
             for book in soup.findAll('h3'):
                 href = book.a.get('href')
-                titre = nettoyer_url(href).removesuffix('/index.html')
+                titre = nettoyer_url(href)
                 resultat.append(titre)
 
 
 def scraper_le_site(base_url):
     # récupérer la page et la parser
     page = requests.get(base_url)
+    print(page.encoding)
     soup = BeautifulSoup(page.content, "html.parser")
 
     resultat = dict()
@@ -119,6 +123,6 @@ def scraper_le_site(base_url):
     for lien in liens:
         # nettoyer l'affichage des categorie
         category = str(lien.string).strip()
-        resultat[category] = lien['href']
+        resultat[category] = nettoyer_url(lien['href'])
 
     return resultat

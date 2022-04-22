@@ -1,4 +1,4 @@
 /.gitignore
 /env
 test.py
-Resultat_scraping.csv
+*.csv
