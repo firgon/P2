@@ -9,7 +9,7 @@ class Writer:
     # constructeur qui reçoit en argument le fichier et les entêtes de colonnes
     def __init__(self, fichier, entete):
 
-        self.csvFile = open(fichier, 'w')
+        self.csvFile = open(fichier, 'w', newline='')
         self.writer = csv.DictWriter(self.csvFile, entete)
 
         self.writer.writeheader()
