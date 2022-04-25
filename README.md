@@ -4,7 +4,7 @@
 
 Scraping is a little script used to :
 - scrap all the books on https://books.toscrape.com/,
-- write main informations on differents csv files (one per category), 
+- write main informations on different csv files (one per category), 
 - and record png images from each book page.
 
 It's a training work from an openclassrooms.com student
