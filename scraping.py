@@ -1,38 +1,59 @@
 """
-script pour scraper tous les livres du site books.toscrape.com
-
+script to scrap all books on books.toscrape.com website
 """
-from parseur_util import *
-from writer_util import *
+
+import parsing_functions
+import os
+import csv
+import urllib.request
+import re
 
 base_url = "http://books.toscrape.com/"
 
-infos_a_scraper = ('product_page_url',
-                   'universal_product_code',
-                   'title',
-                   'price_including_tax',
-                   'price_excluding_tax',
-                   'number_available',
-                   'category',
-                   'product_description',
-                   'review_rating',
-                   'image_url')
+needed_informations = ('product_page_url',
+                       'universal_product_code',
+                       'title',
+                       'price_including_tax',
+                       'price_excluding_tax',
+                       'number_available',
+                       'category',
+                       'product_description',
+                       'review_rating',
+                       'image_url')
 
-categories = scraper_le_site(base_url)
+# create results folder
+file_path = os.getcwd() + '\\Results\\'
+img_file_path = file_path + 'img\\'
 
-for categorie in categories.keys():
-    # on crée un fichier csv prêt à recevoir les infos demandées
-    writer = Writer(categorie+".csv", infos_a_scraper)
+if not os.path.exists(file_path):
+    os.mkdir(file_path)
 
-    # on scrape la catégorie
-    livres = scraper_une_category(base_url, categories[categorie])
+if not os.path.exists(img_file_path):
+    os.mkdir(img_file_path)
 
-    # pour chaque livre récupéré, on scrape la page correspondante
-    for livre in livres:
-        infos_scrapees = scraper_une_page(base_url, livre, categorie)
+categories = parsing_functions.get_categories_from_website(base_url)
+index = 0
 
-        # on enregistre cette première page
-        writer.enregistre_nouvelle_page(infos_scrapees)
+for category in categories.keys():
 
-    # on ferme le fichier
-    writer.close()
+    # open a csv file to store infos
+    with open(file_path + category + '.csv', 'w', newline='', encoding='utf-8') as csv_file:
+        writer = csv.DictWriter(csv_file, needed_informations)
+        writer.writeheader()
+
+        # parse category
+        books = parsing_functions.get_book_urls_from_category(base_url, categories[category])
+
+        # for each books, parse infos
+        for book in books:
+            index = index+1
+            print(str(index)+" : " + book)
+
+            needed_informations = parsing_functions.get_info_from_book(base_url, book, category)
+            writer.writerow(needed_informations)
+
+            # and download image in img folder at category_title.jpg
+            # rename all image with book title (cleaned by removing all non alphanumerics)
+            filename = re.sub('\\W+', '-', needed_informations['title']) + '.jpg'
+            urllib.request.urlretrieve(needed_informations['image_url'],
+                                       img_file_path+filename)
