@@ -1,21 +1,59 @@
 """
-script pour scraper tous les livres du site books.toscrape.com
-
+script to scrap all books on books.toscrape.com website
 """
-from parseur_util import *
-from writer_util import *
 
-# PROVISOIRE : on désigne manuellement une page du site internet
-titre = "the-white-cat-and-the-monk-a-retelling-of-the-poem-pangur-ban_865"
+import parsing_functions
+import os
+import csv
+import urllib.request
+import re
+
 base_url = "http://books.toscrape.com/"
-category = None
 
-infos_scrapees = scraper_une_page(base_url, titre, category)
+needed_informations = ('product_page_url',
+                       'universal_product_code',
+                       'title',
+                       'price_including_tax',
+                       'price_excluding_tax',
+                       'number_available',
+                       'category',
+                       'product_description',
+                       'review_rating',
+                       'image_url')
 
-# on crée un fichier csv prêt à recevoir les infos d'une première page
-writer = Writer("Resultat_scraping.csv", infos_scrapees.keys())
+# create results folder
+file_path = os.getcwd() + '\\Results\\'
+img_file_path = file_path + 'img\\'
 
-# on enregistre cette première page
-writer.enregistre_nouvelle_page(infos_scrapees)
+if not os.path.exists(file_path):
+    os.mkdir(file_path)
 
-writer.close()
+if not os.path.exists(img_file_path):
+    os.mkdir(img_file_path)
+
+categories = parsing_functions.get_categories_from_website(base_url)
+index = 0
+
+for category in categories.keys():
+
+    # open a csv file to store infos
+    with open(file_path + category + '.csv', 'w', newline='', encoding='utf-8') as csv_file:
+        writer = csv.DictWriter(csv_file, needed_informations)
+        writer.writeheader()
+
+        # parse category
+        books = parsing_functions.get_book_urls_from_category(base_url, categories[category])
+
+        # for each books, parse infos
+        for book in books:
+            index = index+1
+            print(str(index)+" : " + book)
+
+            needed_informations = parsing_functions.get_info_from_book(base_url, book, category)
+            writer.writerow(needed_informations)
+
+            # and download image in img folder at category_title.jpg
+            # rename all image with book title (cleaned by removing all non alphanumerics)
+            filename = re.sub('\\W+', '-', needed_informations['title']) + '.jpg'
+            urllib.request.urlretrieve(needed_informations['image_url'],
+                                       img_file_path+filename)
