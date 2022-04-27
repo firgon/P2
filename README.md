@@ -10,7 +10,14 @@ Scraping is a little script used to :
 It’s a training work from an openclassrooms.com student
 
 # How to use
-If you want discover the incredible power of this script just launch it from your Python console and at the end of the process, you will find a new "Results" folder containing one csv file per book category, and a folder 'img' with all the screenshots of the parsed urls at format category_title.png.
+If you want discover the incredible power of this script, you need to :
+- install python on your device (https://www.python.org/downloads/)
+- download parsing_functions.py and scraping.py files
+- install python modules as indicated in requirements.txt
+- then open a command-line and type "python" followed by the path to scraping.py
+
+At the end of the process, you will find a new "Results" folder containing one csv file per book category,
+and a folder 'img' with the image of each book.
 
 ## Technologies
 - Python
