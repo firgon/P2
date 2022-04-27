@@ -52,8 +52,14 @@ for category in categories.keys():
             needed_informations = parsing_functions.get_info_from_book(base_url, book, category)
             writer.writerow(needed_informations)
 
-            # and download image in img folder at category_title.jpg
-            # rename all image with book title (cleaned by removing all non alphanumerics)
-            filename = re.sub('\\W+', '-', needed_informations['title']) + '.jpg'
+            # and download image in img folder
+            # rename all image with book title + ID + extension
+
+            # get extension first
+            last_dot = needed_informations['image_url'].rindex('.')
+            extension = needed_informations['image_url'][last_dot:]
+
+            filename = str(book).removesuffix('/index.html') + extension
+
             urllib.request.urlretrieve(needed_informations['image_url'],
                                        img_file_path+filename)
