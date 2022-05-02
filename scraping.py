@@ -61,6 +61,9 @@ for category in categories.keys():
 
             # get title then
             title = re.sub('\\W+', '-', needed_informations['title'])
+            # truncate if too long
+            if len(title) > 250:
+                title = title[:200]
 
             filename = title + extension
 
