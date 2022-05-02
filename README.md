@@ -25,7 +25,3 @@ and a folder 'img' with the image of each book.
 ## Authors
 
 Our code squad : Firgon
-
-## Licensing
-
-This project was built under the Creative Commons licence.
