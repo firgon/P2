@@ -46,8 +46,8 @@ for category in categories.keys():
 
         # for each books, parse infos
         for book in books:
-            index = index+1
-            print(str(index)+" : " + book)
+            index = index + 1
+            print(str(index) + " : " + book)
 
             needed_informations = parsing_functions.get_info_from_book(base_url, book, category)
             writer.writerow(needed_informations)
@@ -59,7 +59,16 @@ for category in categories.keys():
             last_dot = needed_informations['image_url'].rindex('.')
             extension = needed_informations['image_url'][last_dot:]
 
-            filename = str(book).removesuffix('/index.html') + extension
+            # get title then
+            title = re.sub('\\W+', '-', needed_informations['title'])
+
+            filename = title + extension
+
+            # if a same file already exists add an index
+            index = 2
+            while os.path.exists(img_file_path + filename):
+                filename = title + '(' + index + ')' + extension
+                index += 1
 
             urllib.request.urlretrieve(needed_informations['image_url'],
-                                       img_file_path+filename)
+                                       img_file_path + filename)
