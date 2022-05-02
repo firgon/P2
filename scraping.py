@@ -65,10 +65,10 @@ for category in categories.keys():
             filename = title + extension
 
             # if a same file already exists add an index
-            index = 2
+            nb_file = 2
             while os.path.exists(img_file_path + filename):
-                filename = title + '(' + index + ')' + extension
-                index += 1
+                filename = title + '(' + str(nb_file) + ')' + extension
+                nb_file += 1
 
             urllib.request.urlretrieve(needed_informations['image_url'],
                                        img_file_path + filename)
